@@ -96,6 +96,7 @@ class Veterinalia_Appointment_AJAX_Services_Handler {
             ]);
 
             if ($category_id) {
+                VA_Cache_Helper::invalidate_group(VA_Cache_Helper::PREFIX_CATEGORIES, $professional_id);
                 error_log('VA Save Category - Success: category_id=' . $category_id);
                 // Devolvemos el ID y el nombre de la categoría para añadirla dinámicamente al frontend
                 wp_send_json_success([
@@ -199,6 +200,7 @@ class Veterinalia_Appointment_AJAX_Services_Handler {
             ]);
 
             if ($service_id) {
+                VA_Cache_Helper::invalidate_group(VA_Cache_Helper::PREFIX_SERVICES, $professional_id);
                 error_log('VA Save Service - Success: service_id=' . $service_id);
                 // Devolvemos el ID y los datos del servicio para añadirlo dinámicamente al frontend
                 wp_send_json_success([
@@ -298,7 +300,8 @@ public function handle_inherit_categories_services() {
         }
         $updated_html = ob_get_clean();
         // <<-- FIN DE LA SOLUCIÓN -->>
-
+        VA_Cache_Helper::invalidate_group(VA_Cache_Helper::PREFIX_CATEGORIES, $professional_id);
+        VA_Cache_Helper::invalidate_group(VA_Cache_Helper::PREFIX_SERVICES, $professional_id);
         wp_send_json_success([
             'message' => 'Herencia completada exitosamente.',
             'html' => $updated_html // Devolvemos el HTML en la respuesta.
@@ -402,6 +405,7 @@ public function handle_inherit_categories_services() {
             $result = $db_handler->update_category($category_id, ['name' => $name]);
             
             if ($result) {
+                VA_Cache_Helper::invalidate_group(VA_Cache_Helper::PREFIX_CATEGORIES, $category->professional_id);
                 wp_send_json_success([
                     'message' => 'Categoría actualizada exitosamente.',
                     'category' => [
@@ -463,6 +467,8 @@ public function handle_inherit_categories_services() {
             $result = $db_handler->delete_category($category_id);
             
             if ($result) {
+                VA_Cache_Helper::invalidate_group(VA_Cache_Helper::PREFIX_CATEGORIES, $category->professional_id);
+                VA_Cache_Helper::invalidate_group(VA_Cache_Helper::PREFIX_SERVICES, $category->professional_id);
                 error_log('VA Delete Category - Success: category_id=' . $category_id . ', professional_id=' . $category->professional_id);
                 wp_send_json_success(['message' => 'Categoría eliminada exitosamente.']);
             } else {
@@ -520,6 +526,7 @@ public function handle_inherit_categories_services() {
             ]);
             
             if ($result) {
+                VA_Cache_Helper::invalidate_group(VA_Cache_Helper::PREFIX_SERVICES, $service->professional_id);
                 wp_send_json_success(['message' => 'Servicio actualizado exitosamente.']);
             } else {
                 wp_send_json_error(['message' => 'Error al actualizar el servicio.']);
@@ -575,6 +582,7 @@ public function handle_inherit_categories_services() {
             $result = $db_handler->delete_service($service_id);
             
             if ($result) {
+                VA_Cache_Helper::invalidate_group(VA_Cache_Helper::PREFIX_SERVICES, $service->professional_id);
                 error_log('VA Delete Service - Success: service_id=' . $service_id . ', professional_id=' . $service->professional_id);
                 wp_send_json_success(['message' => 'Servicio eliminado exitosamente.']);
             } else {
